@@ -1,10 +1,25 @@
 from function import *
+from standardisation import *
+from completion import *
+from determinisation import *
 import pandas as pd
 import string
 import wx
 import wx.grid
 
-f = open('file.txt')
+
+filename = input("Entrez le nom du fichier à ouvrir : ")
+try:
+    file_number = int(filename.split(".")[0])
+except ValueError:
+    print("Le nom de fichier n'est pas valide.")
+    exit()
+if file_number < 1 or file_number > 46:
+    print("Le nom de fichier n'est pas valide.")
+    exit()
+
+f = open("Automate_test/" + filename + ".txt")
+
 fichier = get_next_line(f)
 #Enleve les retours a ligne dans la liste "Fichier"
 remove_n(fichier)
@@ -25,21 +40,12 @@ print_pandas(auto)
 #Affiche toute les informations sur lautomates (standard, complet, deterministe)
 print_info(auto)
 
+import wx
 
-
-
-
-
-
-
-
-
-
-
-# Affiche proprement lautomate dans une fenetre graphique grace a wx
+# Définir la classe MyFrame pour l'affichage de la grille
 class MyFrame(wx.Frame):
-    def __init__(self):
-        wx.Frame.__init__(self, None, title="Automate : " + str(fichier[0]) + " états", size=(500, 300))
+    def __init__(self, auto, fichier):
+        wx.Frame.__init__(self, None, title="Automate : " + str(len(auto)) + " états", size=(500, 300))
         panel = wx.Panel(self)
         grid = wx.grid.Grid(panel)
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -67,10 +73,49 @@ class MyFrame(wx.Frame):
         panel.SetSizer(sizer)
 
 
+# Créer l'objet wx.App avant la boucle while
 app = wx.App()
-frame = MyFrame()
-frame.Show()
-app.MainLoop()
+frame = None
+default = 0
+while(1):
+    print("\n\nQue faire avec l'automate ?")
+    if check_standard(auto, "noprint") == 0:
+        print("1 : Standardiser")
+    if check_complet(auto, "noprint") == 0 :
+        print("2 : Completer")
+    if check_deterministe(auto, "noprint") == 0:
+        print("3 : Determiner")
+    if default == 0:
+        print("4 : Afficher par defaut")
+    print("5 : Information sur automate")
+    print("STOP : Met fin au programme")
 
+    do = input("\nSaisir votre choix : ")
 
+    if do == '1' or do == '2' or do == '3' or do == '4' or do == '5' or do == "STOP":
+        if do == '1' and check_standard(auto, "noprint") == 0:
+            standardiser(auto)
+        elif do == '2' and check_complet(auto, "noprint") == 0:
+            completer(auto)
+        elif do == '3' and  check_deterministe(auto, "noprint") == 0:
+            auto = determiniser(auto)
+        elif do == "4" :
+            print("\n")
+        elif do == "STOP":
+            exit()
+        elif do == "5":
+            print_info(auto)
+            default = 1
+            continue
+    else :
+        print("Le choix n'est pas valide")
 
+    default = 1
+    # Afficher la grille dans une fenêtre wx.Frame
+    if not frame:
+        frame = MyFrame(auto, fichier)
+    else:
+        frame.Refresh()
+    frame.Show()
+    frame.Raise()
+    app.MainLoop()

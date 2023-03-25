@@ -17,6 +17,10 @@ def manage_file(fichier):
     else:
         fichier[5] = extract_numbers(fichier[5])
 
+
+
+
+
 #remplis un tableau automate avec les informations du fichiers (sans les transitions)
 def fill_file(fichier):
     auto = [[".."] * (fichier[0] + 2) for i in range(fichier[1])]
@@ -76,9 +80,9 @@ def remove_n(fichier):
 def add_transition(tab, s):
     row = int(s[0])
     col = ord(s[1]) - ord('a') + 2
-    val = s[2]
+    val = s[2:]
     if tab[row][col] != "..":
-        tab[row][col] = tab[row][col] + val
+        tab[row][col] = tab[row][col] + "," + val
     else :
         tab[row][col] = val
 
@@ -128,18 +132,14 @@ def check_exit_and_entry(tab):
 # Vérifier que toutes les transitions sont valides (i.e. un état valide vers un état valide)
 def check_each_transition(tab):
     etats = [row[1] for row in tab[0:]]
-    for i in range(0, len(tab)):
+    for i in range(1, len(tab)):
         for j in range(1, len(tab[i])):
-            transition = str(tab[0][j]) + str(tab[i][1]) + str(tab[i][j])
-            if len(transition) > 2:
-                for k in range(0, len(transition) - 1):
-                    if not (transition[k:k + 2].isdigit() and int(transition[k]) in etats and int(
-                            transition[k + 1]) in etats):
-                        return False
-            elif transition.isdigit() and int(transition[0]) in etats and int(transition[1]) in etats:
-                continue
-            else:
-                return False
+            transitions = str(tab[i][j]).split(",")
+            for transition in transitions:
+                if str(transition) != ".." :
+                    if str(transition) != "P":
+                        if not transition.isdigit() or (int(transition) not in etats):
+                            return False
     return True
 
 
@@ -147,10 +147,24 @@ def check_each_transition(tab):
 
 
 
-    #Check si l'automate est complet (pas d'etats vide, une entre, une sortie, toutes les transitions sont valide)
-def check_complet(tab):
-    return (check_each_transition(tab) and check_transition_vide(tab) and check_exit_and_entry(tab)) == 1
 
+
+    #Check si l'automate est complet (pas d'etats vide, une entre, une sortie, toutes les transitions sont valide)
+def check_complet(tab, affichage):
+    val = 1
+    if check_each_transition(tab) == 0:
+        if affichage == "print":
+            print("Lautomate a des transitions qui n'hesite pas.")
+        val = 0
+    if check_transition_vide(tab) == 0:
+        if affichage == "print":
+            print("Lautomate a des transition5s vide.")
+        val = 0
+    if check_exit_and_entry(tab) == 0:
+        if affichage == "print":
+            print("L'automate n'as pas de sortie.")
+        val = 0
+    return val
 
 
 
@@ -178,77 +192,89 @@ def find_value_entry(tab):
 
 
 
-#vérifie que chaque caractère d'une chaîne de caractères est différent d'une valeur donnée
+# Vérifie que chaque caractère d'une chaîne de caractères est différent d'une valeur donnée
 def check_characters(string, value):
-    for char in string:
+    for char in string.split(","):
         if char == value:
             return True
     return False
 
-
-    #Check si lautomate a une transition pour revenir a lentre
+# Check si l'automate a une transition pour revenir à l'entrée
 def check_returnto_entry(tab):
     value_entry = find_value_entry(tab)
     for i in range(0, len(tab)):
         for j in range(2, len(tab[0])):
-            if (check_characters(tab[i][j], str(value_entry))) == 1:
+            if (check_characters(tab[i][j], str(value_entry))):
                 return False
     return True
+
 
 
 
     #Check si lautomate est standard (une seule entree et aucune transition qui reviens a lentree)
-def check_standard(tab):
+def check_standard(tab, affichage):
     val = 1
     if check_each_transition(tab) == 0:
-        print("Lautomate a des transitions qui n'hesite pas")
+        if affichage == "print":
+            print("Lautomate a des transitions qui n'hesite pas.")
         val = 0
     if check_unique_entry(tab) == 0:
-         print("Lautomate n'a pas que une seule entree")
-         val = 0
+        if affichage == "print":
+            print("Lautomate n'a pas que une seule entree.")
+        val = 0
     if check_returnto_entry(tab) == 0:
-         print("Lautomate a une transition qui retourne a lentree")
-         val = 0
+        if affichage == "print":
+            print("Lautomate a une transition qui retourne a lentree.")
+        val = 0
     return val
 
 #check si lautomate a une transition possible sur deux etats differents
 def check_double_arrow(tab):
-    for i in range(0, len(tab)):
+    for i in range(len(tab)):
         for j in range(2, len(tab[0])):
-            if (len(tab[i][j]) > 1):
+            if ',' in tab[i][j]:
                 return False
     return True
 
+
 #Check si lautomate est deterministe (chaque transition est possible, une seule entree, pas de transition possible sur deux etats)
-def check_deterministe(tab):
+def check_deterministe(tab, affichage):
     val = 1
     if check_each_transition(tab) == 0:
-        print("Lautomate a des transitions qui n'hesite pas")
+        if affichage == "print":
+            print("Lautomate a des transitions qui n'hesite pas.")
         val = 0
     if check_unique_entry(tab) == 0:
-         print("Lautomate n'a pas que une seule entree")
-         val = 0
+        if affichage == "print":
+            print("Lautomate n'a pas que une seule entree.")
+        val = 0
+    if check_transition_vide(tab) == 0:
+        if affichage == "print":
+            print("Lautomate a des transitions vide.")
+        val = 0
     if check_double_arrow(tab) == 0:
-         print("Lautomate a un etats d'ou sort plus d'une fleche libelle par un meme caractere")
-         val = 0
+        if affichage == "print":
+            print("Lautomate a un etats d'ou sort plus d'une fleche libelle par un meme caractere.")
+        val = 0
     return val
 
 
 
 #Affiche toute les informations sur lautomates (standard, complet, deterministe)
 def print_info(auto):
-    if (check_standard(auto)):
-        print("L'affichage est standard")
+    print("\n")
+    if (check_standard(auto, "print")):
+        print("Bien ! L'affichage est standard.\n")
     else:
-        print("L'affichage n'est pas standard")
-    if (check_complet(auto)):
-        print("L'affichage est complet")
+        print("Donc l'affichage n'est pas standard.\n")
+    if (check_complet(auto, "print")):
+        print("Parfait ! L'affichage est complet.\n")
     else:
-        print("L'affichage n'est pas complet")
-    if (check_deterministe(auto)):
-        print("L'affichage est deterministe")
+        print("Donc l'automate n'est pas complet.\n")
+    if (check_deterministe(auto, "print")):
+        print("Excellent ! l'automate est deterministe.\n")
     else:
-        print("L'affichage n'est pas deterministe")
+        print("Donc l'automate n'est pas deterministe.\n")
 
 
 #Affiche lautomate proprement dans le terminal grace a pandas
