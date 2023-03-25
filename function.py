@@ -41,6 +41,8 @@ def fill_file(fichier):
 
     #Determine si un etat est initiaux ou terminal
 def es_or_not(val, nb_init_term, init_term):
+    if nb_init_term == 0:
+        return 0
     if (nb_init_term == 1):
          return val == init_term
     if isinstance(init_term, list):
@@ -126,20 +128,28 @@ def check_exit_and_entry(tab):
         return False
     return True
 
-
-
+#Obternir la liste des etats
+def extract_states(tab):
+    etats = []
+    for row in tab[0:]:
+        if isinstance(row[1], int):
+            etats.extend(str(row[1]).split(","))
+        else:
+            etats.extend(row[1].split(","))
+    return list(set(etats))
 
 # Vérifier que toutes les transitions sont valides (i.e. un état valide vers un état valide)
 def check_each_transition(tab):
-    etats = [row[1] for row in tab[0:]]
+    etats = extract_states(tab)
     for i in range(1, len(tab)):
         for j in range(1, len(tab[i])):
             transitions = str(tab[i][j]).split(",")
             for transition in transitions:
-                if str(transition) != ".." :
+                if str(transition) != "..":
                     if str(transition) != "P":
-                        if not transition.isdigit() or (int(transition) not in etats):
-                            return False
+                        if (str(transition) not in etats):
+                            if not transition.isdigit() or (int(transition) not in etats):
+                                return False
     return True
 
 
@@ -158,7 +168,7 @@ def check_complet(tab, affichage):
         val = 0
     if check_transition_vide(tab) == 0:
         if affichage == "print":
-            print("Lautomate a des transition5s vide.")
+            print("Lautomate a des transitions vide.")
         val = 0
     if check_exit_and_entry(tab) == 0:
         if affichage == "print":

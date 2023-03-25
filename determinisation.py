@@ -20,9 +20,7 @@ def new_tab(auto):
     deter = [[".."] * len(auto[0])]
     deter[0][0] = "E"
     inputs = get_input_symbols(auto)
-    print(inputs)
     deter[0][1] = ",".join([str(x) for x in inputs])
-    print(deter)
     return deter
 
 
@@ -132,25 +130,28 @@ def add_outputs_other_line(auto, deter):
                     deter[len(deter) - 1][0] = "S"
 
                 # Pour chaque transition de la colonne courante
-                for j in range(2, len(deter[0])):
-                    transition = deter[t][j].split(",")
-
+                transition =[]
+                #for j in range(2, len(deter[0])):
+                transition = deter[t][i].split(",")
                     # Pour chaque état de la transition courante
-                    for y in range(len(transition)):
+                transition = list(set(transition))
+                for y in range(len(transition)):
                         # Pour chaque ligne de l'automate
-                        for l in range(len(auto)):
+                    for l in range(len(auto)):
                             # Si l'état de la transition courante correspond à un état de l'automate
-                            if transition[y] == str(auto[l][1]):
+                        if transition[y] == str(auto[l][1]):
                                 # Ajouter les transitions de l'état correspondant à la nouvelle ligne de deter
-                                for n in range(2, len(auto[0])):
-                                    if deter[len(deter) - 1][j] == "..":
-                                        deter[len(deter) - 1][j] = str(auto[l][n])
-                                    elif deter[len(deter) - 1][j]:
-                                        deter[len(deter) - 1][j] = deter[len(deter) - 1][j] + "," + str(auto[l][n])
-                                    else:
-                                        deter[len(deter) - 1][j] = deter[len(deter) - 1][j] + str(auto[l][n])
+                            for n in range(2, len(auto[0])):
+
+                                if deter[len(deter) - 1][n] == "..":
+                                    deter[len(deter) - 1][n] = str(auto[l][n])
+                                elif deter[len(deter) - 1][n]:
+                                    deter[len(deter) - 1][n] = deter[len(deter) - 1][n] + "," + str(auto[l][n])
+                                else:
+                                    deter[len(deter) - 1][n] = deter[len(deter) - 1][n] + str(auto[l][n])
+
                                     # Supprimer les doublons dans les transitions de la nouvelle ligne
-                                    deter[len(deter) - 1][j] = remove_duplicates(deter[len(deter) - 1][j])
+                                deter[len(deter) - 1][n] = remove_duplicates(deter[len(deter) - 1][n])
     # Retourner le tableau déterministe avec les nouvelles sorties ajoutées
         t += 1
     return deter
@@ -159,6 +160,8 @@ def add_outputs_other_line(auto, deter):
 
 def determiniser(auto):
     deter = new_tab(auto)
+    if check_deterministe(auto,"noprint") == 1:
+        return auto
     deter = add_outputs_first_line(auto, deter)
     return deter
 

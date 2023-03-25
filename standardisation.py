@@ -6,7 +6,7 @@ from determinisation import *
 #creer une nouvelle ligne dans le tableau et met letat i
 def add_i(auto):
     nb_col = len(auto[0])
-    nouvelle_ligne = [""] * nb_col
+    nouvelle_ligne = [".."] * nb_col
     auto.insert(0, nouvelle_ligne)
     auto[0][1] = 'i'
     return auto
@@ -20,7 +20,10 @@ def add_i(auto):
 
 def add_state_i(auto, i):
     for j in range(2, len(auto[0])):
-            if auto[0][j]:
+        if auto[i][j] != "..":
+            if auto[0][j] == "..":
+                auto[0][j] = auto[i][j]
+            elif auto[0][j]:
                 auto[0][j] = auto[0][j] + "," + auto[i][j]
             else:
                 auto[0][j] = auto[0][j] + auto[i][j]

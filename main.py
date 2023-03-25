@@ -6,8 +6,9 @@ import pandas as pd
 import string
 import wx
 import wx.grid
+import os
 
-
+determiniser_etat = 0
 filename = input("Entrez le nom du fichier à ouvrir : ")
 try:
     file_number = int(filename.split(".")[0])
@@ -33,9 +34,6 @@ auto = fill_file(fichier)
 
 #Ajoute toutes les transitions du fichiers au tableau de lautomate
 add_all_transition(auto, fichier)
-
-#Affiche lautomate proprement dans le terminal grace a pandas
-print_pandas(auto)
 
 #Affiche toute les informations sur lautomates (standard, complet, deterministe)
 print_info(auto)
@@ -78,12 +76,17 @@ app = wx.App()
 frame = None
 default = 0
 while(1):
+    # Affiche lautomate proprement dans le terminal grace a pandas
+    print("Voici l'automate : \n")
+    print("-----------------------------------------------------------")
+    print_pandas(auto)
+    print("-----------------------------------------------------------")
     print("\n\nQue faire avec l'automate ?")
     if check_standard(auto, "noprint") == 0:
         print("1 : Standardiser")
     if check_complet(auto, "noprint") == 0 :
         print("2 : Completer")
-    if check_deterministe(auto, "noprint") == 0:
+    if check_deterministe(auto, "noprint") == 0 and determiniser_etat == 0:
         print("3 : Determiner")
     if default == 0:
         print("4 : Afficher par defaut")
@@ -92,16 +95,17 @@ while(1):
 
     do = input("\nSaisir votre choix : ")
 
-    if do == '1' or do == '2' or do == '3' or do == '4' or do == '5' or do == "STOP":
+    if do == '1' or do == '2' or do == '3' or do == '4' or do == '5' or do == "STOP" or do == "S":
         if do == '1' and check_standard(auto, "noprint") == 0:
             standardiser(auto)
         elif do == '2' and check_complet(auto, "noprint") == 0:
             completer(auto)
-        elif do == '3' and  check_deterministe(auto, "noprint") == 0:
+        elif do == '3' and  check_deterministe(auto, "noprint") == 0 and determiniser_etat == 0:
             auto = determiniser(auto)
+            determiniser_etat = 1
         elif do == "4" :
             print("\n")
-        elif do == "STOP":
+        elif do == "STOP" or do == "S":
             exit()
         elif do == "5":
             print_info(auto)
@@ -116,6 +120,6 @@ while(1):
         frame = MyFrame(auto, fichier)
     else:
         frame.Refresh()
-    frame.Show()
     frame.Raise()
+    frame.Show()
     app.MainLoop()

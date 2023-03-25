@@ -5,9 +5,8 @@ def add_P(auto):
     nb_col = len(auto[0])
     nouvelle_ligne = [""] * nb_col
     auto.insert(0, nouvelle_ligne)
-    auto[0][1] = 'P'
-    auto[0][2] = 'P'
-    auto[0][3] = 'P'
+    for i in range(0, len(auto[0])):
+        auto[0][i] = 'P'
     auto[0][0] = 'S'
     return auto
 
@@ -18,6 +17,7 @@ def fill_empty_cases(auto):
         for j in range(2, len(auto[i])):
             if not auto[i][j] or str(auto[i][j]) == "..":
                 auto[i][j] = 'P'
+
 
 def completer(auto):
     add_P(auto)
