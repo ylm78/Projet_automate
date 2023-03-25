@@ -10,4 +10,4 @@ Comment marche le programme ?
 8. Cliquer sur la croix de la fenetre qui viens dapparaitre pour continuer
 9. Le programme continue,et redemande ce que vous voulez (dans ce que vous pouvez faire)
 10. Ainsi de suite...
-11. Si vous voulez stopper le programme ecriver "STOP"
+11. Si vous voulez stopper le programme ecrivez "STOP"
